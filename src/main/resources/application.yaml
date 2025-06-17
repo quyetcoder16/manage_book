@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DBMS_CONNECTION:jdbc:mysql://10.8.0.1:3308/manage_book}
+    username: ${DBMS_USERNAME:root}
+    password: ${DBMS_PASSWORD:123}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+server:
+  port: 5555
