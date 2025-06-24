@@ -1,5 +1,4 @@
 package vn.fpt.assignment.quyet.he186796.service;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +30,30 @@ public class BorrowingService {
 
     @Transactional
     public BorrowingDTO save(BorrowingDTO borrowingDTO) {
+        Book book = bookRepository.findById(borrowingDTO.getBookId())
+                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+
+        if (borrowingDTO.getId() == null) { // New borrowing
+            if (book.getAvailableCopies() <= 0) {
+                throw new IllegalStateException("No available copies of this book");
+            }
+            book.setAvailableCopies(book.getAvailableCopies() - 1);
+        } else { // Update borrowing
+            Borrowing existingBorrowing = borrowingRepository.findById(borrowingDTO.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Borrowing not found"));
+            if (existingBorrowing.getReturnDate() == null && borrowingDTO.getReturnDate() != null) {
+                // Book is being returned
+                book.setAvailableCopies(book.getAvailableCopies() + 1);
+            } else if (existingBorrowing.getReturnDate() != null && borrowingDTO.getReturnDate() == null) {
+                // Re-borrowing a returned book
+                if (book.getAvailableCopies() <= 0) {
+                    throw new IllegalStateException("No available copies of this book");
+                }
+                book.setAvailableCopies(book.getAvailableCopies() - 1);
+            }
+        }
+
+        bookRepository.save(book);
         Borrowing borrowing = convertToEntity(borrowingDTO);
         borrowing = borrowingRepository.save(borrowing);
         return convertToDTO(borrowing);
@@ -40,6 +63,12 @@ public class BorrowingService {
     public void delete(Long id) {
         Borrowing borrowing = borrowingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Borrowing not found"));
+        if (borrowing.getReturnDate() == null) {
+            // Increment available copies if the book wasn't returned
+            Book book = borrowing.getBook();
+            book.setAvailableCopies(book.getAvailableCopies() + 1);
+            bookRepository.save(book);
+        }
         borrowingRepository.delete(borrowing);
     }
 

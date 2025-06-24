@@ -7,11 +7,12 @@
 <body>
 <div class="container">
     <h1 class="mt-5">Create Borrowing</h1>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <form th:action="@{/borrowings}" th:object="${borrowing}" method="post">
         <div class="mb-3">
             <label for="bookId" class="form-label">Book</label>
             <select class="form-control" id="bookId" th:field="*{bookId}">
-                <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.name}"></option>
+                <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.name} + ' (' + ${book.availableCopies} + ' available)'"></option>
             </select>
             <div th:if="${#fields.hasErrors('bookId')}" th:errors="*{bookId}" class="text-danger"></div>
         </div>

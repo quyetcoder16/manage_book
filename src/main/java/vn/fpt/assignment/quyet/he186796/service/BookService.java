@@ -48,6 +48,7 @@ public class BookService {
         dto.setName(book.getName());
         dto.setIsbn(book.getIsbn());
         dto.setYear(book.getYear());
+        dto.setAvailableCopies(book.getAvailableCopies());
         dto.setAuthorIds(book.getAuthors().stream().map(Author::getId).collect(Collectors.toSet()));
         return dto;
     }
@@ -58,6 +59,7 @@ public class BookService {
         book.setName(dto.getName());
         book.setIsbn(dto.getIsbn());
         book.setYear(dto.getYear());
+        book.setAvailableCopies(dto.getAvailableCopies());
         if (dto.getAuthorIds() != null) {
             book.setAuthors(dto.getAuthorIds().stream()
                     .map(id -> authorRepository.findById(id)

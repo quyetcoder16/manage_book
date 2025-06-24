@@ -1,3 +1,4 @@
+
 package vn.fpt.assignment.quyet.he186796.controller;
 
 import jakarta.validation.Valid;
@@ -37,8 +38,14 @@ public class BorrowingController {
             model.addAttribute("books", bookService.findAll());
             return "borrowings/create";
         }
-        borrowingService.save(borrowingDTO);
-        return "redirect:/borrowings";
+        try {
+            borrowingService.save(borrowingDTO);
+            return "redirect:/borrowings";
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("books", bookService.findAll());
+            return "borrowings/create";
+        }
     }
 
     @GetMapping("/edit/{id}")
@@ -54,9 +61,15 @@ public class BorrowingController {
             model.addAttribute("books", bookService.findAll());
             return "borrowings/edit";
         }
-        borrowingDTO.setId(id);
-        borrowingService.save(borrowingDTO);
-        return "redirect:/borrowings";
+        try {
+            borrowingDTO.setId(id);
+            borrowingService.save(borrowingDTO);
+            return "redirect:/borrowings";
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("books", bookService.findAll());
+            return "borrowings/edit";
+        }
     }
 
     @GetMapping("/delete/{id}")

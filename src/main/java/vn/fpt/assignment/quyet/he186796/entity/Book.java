@@ -34,6 +34,9 @@ public class Book {
     @Column(name = "year")
     private LocalDate year;
 
+    @Column(name = "available_copies", nullable = false)
+    private int availableCopies = 1; // Default to 1 copy
+
     @ManyToMany
     @JoinTable(
             name = "book_author",
